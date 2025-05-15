@@ -1,89 +1,140 @@
 package com.group.bottombarview.ui.view
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.group.bottombarview.ui.screen.Greeting
+import com.group.bottombarview.ui.theme.BottomBarViewTheme
 
 @Composable
 fun CustomBottomNavigationBar(
-    selectedItem: Int,
+    modifier: Modifier = Modifier,
+    items: List<String>,
+    icons: List<ImageVector>,
+    selectedIndex: Int,
     onItemSelected: (Int) -> Unit
 ) {
-    val items = listOf("Home", "Search", "Profile")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person)
+    val density = LocalDensity.current
+    val itemCount = items.size
 
-    Row(
-        modifier = Modifier
+    // Зберігаємо позиції центрів кнопок
+    val itemCenters = remember { mutableStateListOf<Offset>() }
+
+    // Анімована позиція кульки
+    val animatedOffset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
+
+    // Анімований розмір кульки
+    val animatedSize = remember { Animatable(60f) }
+
+    // Оновлюємо позицію та розмір при зміні вибраного індексу
+    LaunchedEffect(selectedIndex, itemCenters) {
+        if (itemCenters.size == itemCount) {
+            val targetOffset = itemCenters[selectedIndex]
+            animatedOffset.animateTo(
+                targetOffset,
+                animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+            )
+            animatedSize.animateTo(
+                80f,
+                animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+            )
+        }
+    }
+
+    Box(
+        modifier = modifier
             .fillMaxWidth()
-            .height(70.dp)
-            .background(
-                Color.DarkGray,
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-            ),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+            .height(80.dp)
+            .background(Color.White),
+        contentAlignment = Alignment.Center
     ) {
-        items.forEachIndexed { index, item ->
-            val isSelected = index == selectedItem
-            val scale by animateFloatAsState(
-                if (isSelected) 1.2f else 1.0f,
-                animationSpec = tween(300)
-            )
-            val iconColor by animateColorAsState(
-                if (isSelected) Color.White else Color.Gray,
-                animationSpec = tween(300)
-            )
+        // Рядок з кнопками
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            items.forEachIndexed { index, item ->
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .onGloballyPositioned { coordinates ->
+                            val position = coordinates.positionInRoot()
+                            val size = coordinates.size
+                            val center = Offset(
+                                x = position.x + size.width / 2f,
+                                y = position.y + size.height / 2f
+                            )
+                            if (itemCenters.size < itemCount) {
+                                itemCenters.add(center)
+                            } else {
+                                itemCenters[index] = center
+                            }
+                        }
+                        .clickable {
+                            onItemSelected(index)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Фонова кулька для вибраної кнопки
+                    if (selectedIndex == index) {
+                        Box(
+                            modifier = Modifier
+                                .size(animatedSize.value.dp)
+                                .background(Color.LightGray, shape = CircleShape)
+                        )
+                    }
 
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemSelected(index) }
-                    .scale(scale),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = icons[index],
-                    contentDescription = item,
-                    tint = iconColor,
-                    modifier = Modifier.size(30.dp)
-                )
-                Text(
-                    text = item,
-                    color = iconColor,
-                    fontSize = 12.sp
-                )
+                    // Іконка
+                    Icon(
+                        imageVector = icons[index],
+                        contentDescription = item,
+                        tint = if (selectedIndex == index) Color.Black else Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
+        }
+
+        // Анімована кулька, що переміщується між кнопками
+        if (itemCenters.size == itemCount) {
+            Box(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            x = (animatedOffset.value.x - animatedSize.value / 2).toInt(),
+                            y = (animatedOffset.value.y - animatedSize.value / 2).toInt()
+                        )
+                    }
+                    .size(animatedSize.value.dp)
+                    .background(Color.LightGray, shape = CircleShape)
+            )
         }
     }
 }
 
-@Composable
-fun CustomBottomNavScreen() {
-    var selectedIndex by remember { mutableStateOf(0) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(modifier = Modifier.weight(1f)) // Контент зверху
-        CustomBottomNavigationBar(
-            selectedItem = selectedIndex,
-            onItemSelected = { selectedIndex = it }
-        )
-        Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    BottomBarViewTheme {
+        Greeting("Android")
     }
 }

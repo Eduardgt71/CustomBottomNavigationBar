@@ -14,21 +14,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.group.bottombarview.ui.theme.BottomBarViewTheme
+import com.group.bottombarview.ui.view.BottomButtonModel
 import com.group.bottombarview.ui.view.CustomBottomNavigationBar
 
 @Composable
 fun Greeting() {
-    val items = listOf("Home", "Search", "Profile")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person)
     var selectedIndex by remember { mutableStateOf(0) }
+    val buttons = listOf(
+        BottomButtonModel(Icons.Filled.Home, "Home", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Search, "Search", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Person, "Profile", Color.Black, Color.Gray),
+    )
 
     Scaffold(
         bottomBar = {
             CustomBottomNavigationBar(
-                items = items,
-                icons = icons,
+                buttons = buttons,
                 selectedIndex = selectedIndex,
                 onItemSelected = { index ->
                     selectedIndex = index
@@ -36,7 +40,6 @@ fun Greeting() {
             )
         }
     ) { innerPadding ->
-        // Вміст основного екрану
         Box(modifier = Modifier.padding(innerPadding)) {
             Text(
                 text = "Hello World!",
@@ -44,6 +47,7 @@ fun Greeting() {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

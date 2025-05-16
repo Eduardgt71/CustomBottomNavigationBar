@@ -8,7 +8,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -19,75 +24,89 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.group.bottombarview.ui.screen.Greeting
+import androidx.compose.ui.unit.sp
 import com.group.bottombarview.ui.theme.BottomBarViewTheme
+
+data class BottomButtonModel(
+    val icon: ImageVector,
+    val title: String,
+    val selectedColor: Color,
+    val defaultColor: Color
+)
 
 @Composable
 fun CustomBottomNavigationBar(
     modifier: Modifier = Modifier,
-    items: List<String>,
-    icons: List<ImageVector>,
+    buttons: List<BottomButtonModel>,
     selectedIndex: Int,
-    onItemSelected: (Int) -> Unit
+    onItemSelected: (Int) -> Unit,
+    circleSize: Float = 40f,
+    height: Dp = 80.dp,
 ) {
-    val size = 50f
-    val height = 70
 
-    val itemCount = items.size
     val itemCenters = remember { mutableStateListOf<Offset>() }
-    val animatedOffset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
-    val animatedSize = remember { Animatable(size) }
-
-    LaunchedEffect(selectedIndex) {
-        val targetOffset = itemCenters[selectedIndex]
-
-        // 1. Зменшення кульки
-        animatedSize.animateTo(
-            targetValue = size / 2,
-            animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
-        )
-
-        // 2. Переміщення кульки
-        animatedOffset.animateTo(
-            targetValue = targetOffset,
-            animationSpec = tween(durationMillis = 200, easing = LinearOutSlowInEasing)
-        )
-
-        // 3. Збільшення кульки
-        animatedSize.animateTo(
-            targetValue = size,
-            animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
-        )
+    val animatedOffset = if (itemCenters.isNotEmpty()) {
+        remember { Animatable(itemCenters[0], Offset.VectorConverter) }
+    } else {
+        null
     }
+
+    val animatedSize = remember { Animatable(circleSize) }
+
+    if (itemCenters.isNotEmpty())
+        LaunchedEffect(selectedIndex) {
+            val targetOffset = itemCenters[selectedIndex]
+            animatedSize.animateTo(
+                targetValue = circleSize / 2,
+                animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
+            )
+            animatedOffset?.animateTo(
+                targetValue = targetOffset,
+                animationSpec = tween(durationMillis = 200, easing = LinearOutSlowInEasing)
+            )
+            animatedSize.animateTo(
+                targetValue = circleSize,
+                animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
+            )
+        }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(height.dp)
+            .height(height)
             .background(Color.Blue),
     ) {
-        val animatedOffsetX = animatedOffset.value.x
-        val halfAnimatedSize = animatedSize.value * 1.3
-        val x = (animatedOffsetX - halfAnimatedSize).toInt()
-        val animatedOffsetY = animatedOffset.value.y
-        val y = (animatedOffsetY - halfAnimatedSize).toInt()
+        animatedOffset?.let {
+            val animatedOffsetX = animatedOffset.value.x
+            val halfAnimatedSize = animatedSize.value * 1.3
+            val x = (animatedOffsetX - halfAnimatedSize).toInt()
+            val animatedOffsetY = animatedOffset.value.y
+            val y = (animatedOffsetY - halfAnimatedSize).toInt()
 
-        if (animatedOffset.value != Offset.Zero)
             Box(
                 modifier = Modifier
                     .offset { IntOffset(x = x, y = y) }
                     .size(animatedSize.value.dp)
                     .background(Color.Red, shape = CircleShape)
             )
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            items.forEachIndexed { index, item ->
-                Button(index, item, itemCenters, itemCount, onItemSelected, icons, selectedIndex)
+            buttons.forEachIndexed { index, button ->
+                Button(
+                    index,
+                    itemCenters,
+                    buttons.size,
+                    onItemSelected,
+                    selectedIndex,
+                    button
+                )
             }
         }
     }
@@ -96,53 +115,100 @@ fun CustomBottomNavigationBar(
 @Composable
 private fun Button(
     index: Int,
-    item: String,
     itemCenters: SnapshotStateList<Offset>,
     itemCount: Int,
     onItemSelected: (Int) -> Unit,
-    icons: List<ImageVector>,
-    selectedIndex: Int
+    selectedIndex: Int,
+    buttonModel: BottomButtonModel
 ) {
+    val yCenters = remember { mutableStateOf<Float?>(null) }
+    val xCenters = remember { mutableStateOf<Float?>(null) }
+
+    if (xCenters.value != null && yCenters.value != null) {
+        val center = Offset(xCenters.value!!, yCenters.value!!)
+        if (itemCenters.size < itemCount) {
+            itemCenters.add(center)
+        } else {
+            itemCenters[index] = center
+        }
+    }
+
     Column(
         modifier = Modifier
-            .size(60.dp)
+            .fillMaxHeight()
             .onGloballyPositioned { coordinates ->
                 val position = coordinates.positionInParent()
                 val positionX = position.x
-                val positionY = position.y
                 val sizeW = coordinates.size.width
-                val sizeH = coordinates.size.height
                 val x = positionX + sizeW / 2f
-                val y = positionY + sizeH / 2f
-
-                val center = Offset(x, y)
-                if (itemCenters.size < itemCount) {
-                    itemCenters.add(center)
-                } else {
-                    itemCenters[index] = center
-                }
-            }
-            .clickable {
-                onItemSelected(index)
+                xCenters.value = x
             },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Іконка
-        Icon(
-            imageVector = icons[index],
-            contentDescription = item,
-            tint = if (selectedIndex == index) Color.Black else Color.Gray,
-            modifier = Modifier.size(24.dp)
-        )
+        Column(
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    val position = coordinates.positionInParent()
+                    val positionY = position.y
+                    val sizeH = coordinates.size.height
+                    val y: Float = positionY + sizeH / 2f
+                    yCenters.value = y
+                }
+                .clickable {
+                    onItemSelected(index)
+                },
+        ) {
+            Icon(
+                imageVector = buttonModel.icon,
+                contentDescription = "",
+                tint = if (selectedIndex == index) buttonModel.selectedColor else buttonModel.defaultColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        if (buttonModel.title.isNotEmpty()) {
+            Spacer(Modifier.height(6.dp))
+
+            Text(
+                text = buttonModel.title,
+                fontSize = 12.sp,
+                color = if (selectedIndex == index) buttonModel.selectedColor else buttonModel.defaultColor,
+            )
+        }
     }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun CustomBottomNavigationBarPreview() {
+    val buttons = listOf(
+        BottomButtonModel(Icons.Filled.Home, "Home", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Search, "Search", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Person, "Profile", Color.Black, Color.Gray),
+    )
     BottomBarViewTheme {
-        Greeting()
+        CustomBottomNavigationBar(
+            buttons = buttons,
+            selectedIndex = 0,
+            onItemSelected = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BottomBarViewThemeWithEmptyTextPreview() {
+    val buttons = listOf(
+        BottomButtonModel(Icons.Filled.Home, "", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Search, "", Color.Black, Color.Gray),
+        BottomButtonModel(Icons.Filled.Person, "", Color.Black, Color.Gray),
+    )
+    BottomBarViewTheme {
+        CustomBottomNavigationBar(
+            buttons = buttons,
+            selectedIndex = 0,
+            onItemSelected = {}
+        )
     }
 }

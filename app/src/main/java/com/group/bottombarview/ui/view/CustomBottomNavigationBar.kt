@@ -8,10 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -28,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.group.bottombarview.ui.screen.Screen
 import com.group.bottombarview.ui.theme.BottomBarViewTheme
 
 data class BottomButtonModel(
@@ -40,12 +37,13 @@ data class BottomButtonModel(
 @Composable
 fun CustomBottomNavigationBar(
     modifier: Modifier = Modifier,
-    buttons: List<BottomButtonModel>,
+    screens: List<Screen>,
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
-    circleSize: Float = 40f,
-    height: Dp = 80.dp,
-) {
+    navigationBarHeight: Dp = 80.dp,
+    backGroundCircleSize: Float = 40f,
+    backGroundCircleColor: Color = Color.Yellow,
+    ) {
 
     val itemCenters = remember { mutableStateListOf<Offset>() }
     val animatedOffset = if (itemCenters.isNotEmpty()) {
@@ -54,13 +52,13 @@ fun CustomBottomNavigationBar(
         null
     }
 
-    val animatedSize = remember { Animatable(circleSize) }
+    val animatedSize = remember { Animatable(backGroundCircleSize) }
 
     if (itemCenters.isNotEmpty())
         LaunchedEffect(selectedIndex) {
             val targetOffset = itemCenters[selectedIndex]
             animatedSize.animateTo(
-                targetValue = circleSize / 2,
+                targetValue = backGroundCircleSize / 2,
                 animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
             )
             animatedOffset?.animateTo(
@@ -68,7 +66,7 @@ fun CustomBottomNavigationBar(
                 animationSpec = tween(durationMillis = 200, easing = LinearOutSlowInEasing)
             )
             animatedSize.animateTo(
-                targetValue = circleSize,
+                targetValue = backGroundCircleSize,
                 animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
             )
         }
@@ -76,9 +74,10 @@ fun CustomBottomNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(height)
+            .height(navigationBarHeight)
             .background(Color.Blue),
     ) {
+        // Background circle
         animatedOffset?.let {
             val animatedOffsetX = animatedOffset.value.x
             val halfAnimatedSize = animatedSize.value * 1.3
@@ -90,7 +89,7 @@ fun CustomBottomNavigationBar(
                 modifier = Modifier
                     .offset { IntOffset(x = x, y = y) }
                     .size(animatedSize.value.dp)
-                    .background(Color.Red, shape = CircleShape)
+                    .background(backGroundCircleColor, shape = CircleShape)
             )
         }
 
@@ -98,14 +97,14 @@ fun CustomBottomNavigationBar(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            buttons.forEachIndexed { index, button ->
+            screens.forEachIndexed { index, button ->
                 Button(
                     index,
                     itemCenters,
-                    buttons.size,
+                    screens.size,
                     onItemSelected,
                     selectedIndex,
-                    button
+                    button.model
                 )
             }
         }
@@ -181,15 +180,11 @@ private fun Button(
 
 @Preview(showBackground = true)
 @Composable
-fun CustomBottomNavigationBarPreview() {
-    val buttons = listOf(
-        BottomButtonModel(Icons.Filled.Home, "Home", Color.Black, Color.Gray),
-        BottomButtonModel(Icons.Filled.Search, "Search", Color.Black, Color.Gray),
-        BottomButtonModel(Icons.Filled.Person, "Profile", Color.Black, Color.Gray),
-    )
+private fun CustomBottomNavigationBarPreview() {
+    val screens = listOf(Screen.Home, Screen.Search, Screen.Profile)
     BottomBarViewTheme {
         CustomBottomNavigationBar(
-            buttons = buttons,
+            screens = screens,
             selectedIndex = 0,
             onItemSelected = {}
         )
@@ -198,15 +193,11 @@ fun CustomBottomNavigationBarPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun BottomBarViewThemeWithEmptyTextPreview() {
-    val buttons = listOf(
-        BottomButtonModel(Icons.Filled.Home, "", Color.Black, Color.Gray),
-        BottomButtonModel(Icons.Filled.Search, "", Color.Black, Color.Gray),
-        BottomButtonModel(Icons.Filled.Person, "", Color.Black, Color.Gray),
-    )
+private fun BottomBarViewThemeWithEmptyTextPreview() {
+    val screens = listOf(Screen.HomeWithOutText, Screen.SearchWithOutText, Screen.ProfileWithOutText)
     BottomBarViewTheme {
         CustomBottomNavigationBar(
-            buttons = buttons,
+            screens = screens,
             selectedIndex = 0,
             onItemSelected = {}
         )

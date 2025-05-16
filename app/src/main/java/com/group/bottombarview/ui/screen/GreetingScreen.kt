@@ -19,7 +19,7 @@ import com.group.bottombarview.ui.theme.BottomBarViewTheme
 import com.group.bottombarview.ui.view.CustomBottomNavigationBar
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting() {
     val items = listOf("Home", "Search", "Profile")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person)
     var selectedIndex by remember { mutableStateOf(0) }
@@ -39,8 +39,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         // Вміст основного екрану
         Box(modifier = Modifier.padding(innerPadding)) {
             Text(
-                text = "Hello $name!",
-                modifier = modifier
+                text = "Hello World!",
             )
         }
     }
@@ -50,6 +49,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     BottomBarViewTheme {
-        Greeting("Android")
+        Greeting()
     }
 }

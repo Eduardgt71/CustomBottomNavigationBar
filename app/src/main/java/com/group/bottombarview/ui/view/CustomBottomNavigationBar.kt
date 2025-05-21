@@ -41,9 +41,9 @@ fun CustomBottomNavigationBar(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     navigationBarHeight: Dp = 80.dp,
-    backGroundCircleSize: Float = 40f,
-    backGroundCircleColor: Color = Color.Yellow,
-    ) {
+    backgroundCircleSize: Float = 40f,
+    backgroundCircleColor: Color = Color.Yellow,
+) {
 
     val itemCenters = remember { mutableStateListOf<Offset>() }
     val animatedOffset = if (itemCenters.isNotEmpty()) {
@@ -52,13 +52,13 @@ fun CustomBottomNavigationBar(
         null
     }
 
-    val animatedSize = remember { Animatable(backGroundCircleSize) }
+    val animatedSize = remember { Animatable(backgroundCircleSize) }
 
     if (itemCenters.isNotEmpty())
         LaunchedEffect(selectedIndex) {
             val targetOffset = itemCenters[selectedIndex]
             animatedSize.animateTo(
-                targetValue = backGroundCircleSize / 2,
+                targetValue = backgroundCircleSize / 2,
                 animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
             )
             animatedOffset?.animateTo(
@@ -66,7 +66,7 @@ fun CustomBottomNavigationBar(
                 animationSpec = tween(durationMillis = 200, easing = LinearOutSlowInEasing)
             )
             animatedSize.animateTo(
-                targetValue = backGroundCircleSize,
+                targetValue = backgroundCircleSize,
                 animationSpec = tween(durationMillis = 100, easing = LinearOutSlowInEasing)
             )
         }
@@ -80,16 +80,16 @@ fun CustomBottomNavigationBar(
         // Background circle
         animatedOffset?.let {
             val animatedOffsetX = animatedOffset.value.x
-            val halfAnimatedSize = animatedSize.value * 1.3
-            val x = (animatedOffsetX - halfAnimatedSize).toInt()
+            val correctAnimatedSize = animatedSize.value * 1.3
+            val x = (animatedOffsetX - correctAnimatedSize).toInt()
             val animatedOffsetY = animatedOffset.value.y
-            val y = (animatedOffsetY - halfAnimatedSize).toInt()
+            val y = (animatedOffsetY - correctAnimatedSize).toInt()
 
             Box(
                 modifier = Modifier
                     .offset { IntOffset(x = x, y = y) }
                     .size(animatedSize.value.dp)
-                    .background(backGroundCircleColor, shape = CircleShape)
+                    .background(backgroundCircleColor, shape = CircleShape)
             )
         }
 

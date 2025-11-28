@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -40,8 +39,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            implementation("androidx.compose.material:material:1.5.3")
-            implementation("androidx.compose.ui:ui:1.5.3")
+            implementation("androidx.compose.material:material:1.9.5")
+            implementation("androidx.compose.ui:ui:1.9.5")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

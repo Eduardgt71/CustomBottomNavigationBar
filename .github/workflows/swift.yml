@@ -1,0 +1,31 @@
+name: Publish KMP Library
+
+on:
+  push:
+    tags:
+      - 'v*'  # Триггериться на тегах типу v1.0.0
+
+jobs:
+  build-and-publish:
+    runs-on: macos-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Build Android AAR
+        run: ./gradlew assembleRelease
+
+      - name: Build iOS XCFramework
+        run: ./gradlew assembleXCFramework  # тобі потрібно додати task у build.gradle.kts
+
+      - name: Publish all artifacts
+        run: ./gradlew publish

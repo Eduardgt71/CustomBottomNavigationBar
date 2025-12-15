@@ -38,9 +38,6 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-
-            implementation("androidx.compose.material:material:1.9.5")
-            implementation("androidx.compose.ui:ui:1.9.5")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -1,6 +1,5 @@
 package com.group.custombottomnavigationbar
 
-
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -10,22 +9,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import com.group.custombottomnavigationbar.drawable.HomeIcon
 import com.group.custombottomnavigationbar.drawable.Person
 import com.group.custombottomnavigationbar.drawable.Search
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class TabsModel(
@@ -57,6 +59,7 @@ data class TabsModel(
                 TabsModel(HomeIcon, "Home"),
                 TabsModel(Search, "Search"),
                 TabsModel(Person, "Profile"),
+                TabsModel(HomeIcon, "StreamingVideo"),
             )
         }
 
@@ -100,6 +103,7 @@ fun CustomBottomNavigationBar(
     tabs: List<TabsModel> = TabsModel.getBaseTabListWithText(),
     colors: Colors = Colors.getDefaultColors(),
     enableAnimation: Boolean = true,
+    budgets: State<Map<Int, Int>>? = null,
     onItemSelected: (Int) -> Unit = {},
 ) {
     var selectedIndex by remember { mutableIntStateOf(selectedIndex) }
@@ -109,14 +113,15 @@ fun CustomBottomNavigationBar(
     val circleX = remember { Animatable(0f) }
     var isVisible by remember { mutableStateOf(false) }
     val columnPositionsX = remember { mutableStateListOf<Float>() }
+    val circleSizeVisible = 16
     val circleSize by animateDpAsState(
-        targetValue = if (isVisible) 16.dp else 0.dp,
+        targetValue = if (isVisible) circleSizeVisible.dp else 0.dp,
         label = ""
     )
 
     if (enableAnimation) {
         LaunchedEffect(Unit) {
-            val defaultX = columnPositionsX[0]
+            val defaultX = columnPositionsX[selectedIndex]
             if (circleX.targetValue == 0f && defaultX != 0f) {
                 circleX.animateTo(targetValue = defaultX, animationSpec = tween(10))
             }
@@ -143,7 +148,8 @@ fun CustomBottomNavigationBar(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
             .fillMaxWidth()
-            .background(Color.Blue),
+            .background(colors.bacGroundColor)
+            .padding(3.dp),
     ) {
 
         if (enableAnimation) {
@@ -160,7 +166,6 @@ fun CustomBottomNavigationBar(
             )
         }
 
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -169,15 +174,16 @@ fun CustomBottomNavigationBar(
                 Button(
                     Modifier.onGloballyPositioned { layout ->
                         if (enableAnimation) {
-                            val centerX = layout.boundsInParent().center.x
+                            val centerX = layout.boundsInParent().center.x - circleSizeVisible
                             if (columnPositionsX.size > index) {
                                 columnPositionsX[index] = centerX
                             } else {
                                 columnPositionsX.add(centerX)
                             }
 
-                            val centerY = layout.boundsInParent().center.y / 2 // for center column
-                            moveToY = centerY / 2 // for center top part column (image)
+                            val centerY = layout.boundsInParent().center.y / 2// for center column
+                            moveToY =
+                                if (button.title.isNotEmpty()) centerY / 2 else centerY  // for center top part column (image)
                         }
                     },
                     isVisible = isVisible,
@@ -186,18 +192,21 @@ fun CustomBottomNavigationBar(
                     icon = button.icon,
                     title = button.title,
                     colors = colors,
+                    budgetsValue = budgets?.value[index] ?: 0,
                     onClick = {
-                        selectedIndex = index
+                        if (selectedIndex != index) {
+                            selectedIndex = index
 
-                        if (enableAnimation) {
-                            val x = columnPositionsX.getOrNull(index)
-                            x?.let {
-                                moveToX = x
+                            if (enableAnimation) {
+                                val x = columnPositionsX.getOrNull(index)
+                                x?.let {
+                                    moveToX = x
+                                }
+
+                                isVisible = true
                             }
-
-                            isVisible = true
+                            onItemSelected.invoke(it)
                         }
-                        onItemSelected.invoke(it)
                     },
                 )
             }
@@ -214,48 +223,56 @@ private fun Button(
     title: String,
     colors: Colors,
     isVisible: Boolean,
+    budgetsValue: Int,
     onClick: (Int) -> Unit,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    Box(
+        modifier = modifier
+            .clickable {
+                onClick(index)
+            }) {
         Column(
-            modifier = Modifier
-                .clickable {
-                    onClick(index)
-                },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val modifier = if (index == selectedIndex && !isVisible) {
-                Modifier.background(
-                    color = colors.selectCircleColor,
-                    shape = RoundedCornerShape(16.dp)
-                )
-            } else {
-                Modifier
+            Column {
+                val modifier = if (index == selectedIndex && !isVisible) {
+                    Modifier.background(
+                        color = colors.selectCircleColor,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                } else {
+                    Modifier
+                }
+                Column(
+                    modifier = modifier
+                        .padding(2.dp)
+                        .padding(2.dp)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "",
+                        tint = if (selectedIndex == index) colors.selectedIconColor else colors.unSelectedIconColor,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
-            Column(
-                modifier = modifier
-                    .padding(2.dp)
-                    .padding(2.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "",
-                    tint = if (selectedIndex == index) colors.selectedIconColor else colors.unSelectedIconColor,
-                    modifier = Modifier.size(24.dp)
+            if (title.isNotEmpty()) {
+                Text(
+                    text = title,
+                    fontSize = 12.sp,
+                    color = if (selectedIndex == index) colors.selectedTextColor else colors.unSelectedTextColor,
                 )
             }
         }
-        if (title.isNotEmpty()) {
-            Spacer(Modifier.height(6.dp))
 
-            Text(
-                text = title,
-                fontSize = 12.sp,
-                color = if (selectedIndex == index) colors.selectedTextColor else colors.unSelectedTextColor,
-            )
+        if (budgetsValue != 0) {
+            BadgedBox(
+                modifier = Modifier.align(Alignment.TopEnd),
+                badge = {
+                    Badge { Text(budgetsValue.toString()) }
+                }
+            ) {}
         }
     }
 }
@@ -264,7 +281,10 @@ private fun Button(
 @Preview(showBackground = true)
 @Composable
 private fun CustomBottomNavigationBarPreview() {
-    CustomBottomNavigationBar()
+    val map = MutableStateFlow(mapOf(1 to 11))
+    CustomBottomNavigationBar(
+        budgets = map.asStateFlow().collectAsState()
+    )
 }
 
 @Preview(showBackground = true)
@@ -272,7 +292,5 @@ private fun CustomBottomNavigationBarPreview() {
 private fun BottomBarViewThemeWithEmptyTextPreview() {
     CustomBottomNavigationBar(
         tabs = TabsModel.getBaseTabListWithOutText(),
-        selectedIndex = 0,
-        onItemSelected = {}
     )
 }

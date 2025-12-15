@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -42,9 +41,9 @@ import kotlin.math.sin
 fun DonutTabs(
     tabs: List<TabsModel>, // Список табів з іконками і назвами
     modifier: Modifier = Modifier, // Модифікатор для зовнішнього компонування
-    donutThickness: Dp = 30.dp, // Товщина бублика
     onTabSelected: (Int) -> Unit = {} // Callback при виборі таба
 ) {
+    val donutThickness: Dp = 30.dp // Товщина бублика
     val count = tabs.size
     if (count == 0) return // Якщо список порожній, нічого не малюємо
 
@@ -63,9 +62,11 @@ fun DonutTabs(
     )
 
     // Контейнер для бублика та іконок
+
+    val roundIntSize = 100
     Box(
         modifier = modifier
-            .size(150.dp) // Фіксований розмір бублика
+            .size(roundIntSize.dp) // Фіксований розмір бублика
             .aspectRatio(1f), // Квадратна форма
         contentAlignment = Alignment.Center
     ) {
@@ -98,7 +99,7 @@ fun DonutTabs(
             val angleRad = (centerAngle * (PI / 180.0)).toFloat()
 
             // Відстань від центру кола до центру іконки
-            val radius = with(LocalDensity.current) { 120.dp.toPx() } / 2
+            val radius = with(LocalDensity.current) { (roundIntSize * 0.7f).dp.toPx() } / 2
 
             // Розмір іконки в пікселях
             val iconSizePx = with(LocalDensity.current) { iconSize.toPx() }

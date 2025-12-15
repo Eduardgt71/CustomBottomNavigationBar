@@ -14,8 +14,8 @@ kotlin {
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
         namespace = "com.group.bottomview"
-        compileSdk = 36
-        minSdk = 31
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
 
         withHostTestBuilder {
         }
@@ -63,7 +63,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
+                implementation(compose.material3)
+                implementation(compose.components.uiToolingPreview)
             }
         }
 

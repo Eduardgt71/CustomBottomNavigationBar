@@ -1,4 +1,4 @@
-package com.group.custombottomnavigationbar.drawable
+package com.group.bottomview.drawable
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor

@@ -1,4 +1,4 @@
-package com.group.custombottomnavigationbar
+package com.group.bottomview
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
@@ -42,9 +42,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.group.custombottomnavigationbar.drawable.HomeIcon
-import com.group.custombottomnavigationbar.drawable.Person
-import com.group.custombottomnavigationbar.drawable.Search
+import com.group.bottomview.drawable.HomeIcon
+import com.group.bottomview.drawable.Person
+import com.group.bottomview.drawable.Search
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -59,7 +59,6 @@ data class TabsModel(
                 TabsModel(HomeIcon, "Home"),
                 TabsModel(Search, "Search"),
                 TabsModel(Person, "Profile"),
-                TabsModel(HomeIcon, "StreamingVideo"),
             )
         }
 

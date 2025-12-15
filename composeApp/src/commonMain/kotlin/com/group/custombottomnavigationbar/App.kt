@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.group.bottomview.CustomBottomNavigationBar
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

@@ -6,7 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -27,6 +26,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.group.bottomview.ConstantsUI.ICON_SIZE
+import com.group.bottomview.ConstantsUI.PARENT_CIRCLE_SIZE
 import com.group.bottomview.TabsModel
 import com.group.bottomview.drawable.HomeIcon
 import com.group.bottomview.drawable.Person
@@ -39,8 +40,9 @@ import kotlin.math.sin
 
 @Composable
 fun DonutTabs(
-    tabs: List<TabsModel>, // Список табів з іконками і назвами
     modifier: Modifier = Modifier, // Модифікатор для зовнішнього компонування
+    tabs: List<TabsModel>, // Список табів з іконками і назвами
+    selectedTabIndex: Int = 0,
     onTabSelected: (Int) -> Unit = {} // Callback при виборі таба
 ) {
     val donutThickness: Dp = 30.dp // Товщина бублика
@@ -48,7 +50,7 @@ fun DonutTabs(
     if (count == 0) return // Якщо список порожній, нічого не малюємо
 
     val anglePerItem = 360f / count // Кут, який займає кожен сектор бублика
-    var selectedIndex by remember { mutableStateOf(0) } // Вибраний таб
+    var selectedIndex by remember { mutableStateOf(selectedTabIndex) } // Вибраний таб
 
     // Обчислюємо обертання бублика так, щоб вибраний таб опинився внизу (нижній центр)
     val targetRotation = 90f - (selectedIndex * anglePerItem + anglePerItem / 2)
@@ -58,16 +60,16 @@ fun DonutTabs(
             durationMillis = 600,
             easing = FastOutSlowInEasing
         ), // Анімація обертання
-        label = "donutRotation"
+        label = "donutRotation",
+        finishedListener = {
+            onTabSelected(selectedIndex)
+        }
     )
 
     // Контейнер для бублика та іконок
-
-    val roundIntSize = 100
     Box(
         modifier = modifier
-            .size(roundIntSize.dp) // Фіксований розмір бублика
-            .aspectRatio(1f), // Квадратна форма
+            .size(PARENT_CIRCLE_SIZE.dp), // Фіксований розмір бублика
         contentAlignment = Alignment.Center
     ) {
 
@@ -92,17 +94,16 @@ fun DonutTabs(
 
         // --- Малюємо іконки ---
         tabs.forEachIndexed { index, tab ->
-            val iconSize = 24.dp
             // Центр сектора в градусах
             val centerAngle = index * anglePerItem + anglePerItem / 2
             // Кут в радіанах
             val angleRad = (centerAngle * (PI / 180.0)).toFloat()
 
             // Відстань від центру кола до центру іконки
-            val radius = with(LocalDensity.current) { (roundIntSize * 0.7f).dp.toPx() } / 2
+            val radius = with(LocalDensity.current) { (PARENT_CIRCLE_SIZE * 0.7f).dp.toPx() } / 2
 
             // Розмір іконки в пікселях
-            val iconSizePx = with(LocalDensity.current) { iconSize.toPx() }
+            val iconSizePx = with(LocalDensity.current) { ICON_SIZE }
 
             // Позиція центру іконки на колі з урахуванням обертання бублика
             val xCenter = cos(angleRad + rotation * (PI / 180f)) * radius
@@ -116,23 +117,19 @@ fun DonutTabs(
             Box(
                 modifier = Modifier
                     .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
-                    .size(iconSize)
                     .clickable {
                         selectedIndex = index
-                        onTabSelected(index)
                     },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(iconSize),
+                    modifier = Modifier.size(ICON_SIZE.dp),
                     imageVector = tab.icon,
                     contentDescription = tab.title,
                     tint = if (index == selectedIndex) Color.Black else Color.Gray
                 )
             }
         }
-
-
     }
 }
 
@@ -142,7 +139,6 @@ private fun DonutTabsPreview() {
     val tabs = listOf(
         TabsModel(HomeIcon, "Home"),
         TabsModel(Search, "Fav"),
-        //TabsModel(HomeIcon, "Settings"),
         TabsModel(Person, "Profile"),
     )
 

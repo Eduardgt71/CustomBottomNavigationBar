@@ -42,6 +42,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.group.bottomview.ConstantsUI.ICON_SIZE
+import com.group.bottomview.ConstantsUI.PARENT_CIRCLE_SIZE
 import com.group.bottomview.drawable.HomeIcon
 import com.group.bottomview.drawable.Person
 import com.group.bottomview.drawable.Search
@@ -96,7 +98,7 @@ data class Colors(
 }
 
 @Composable
-fun CustomBottomNavigationBar(
+fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     selectedIndex: Int = 0,
     tabs: List<TabsModel> = TabsModel.getBaseTabListWithText(),
@@ -170,7 +172,7 @@ fun CustomBottomNavigationBar(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             tabs.forEachIndexed { index, button ->
-                Button(
+                ButtonTab(
                     Modifier.onGloballyPositioned { layout ->
                         if (enableAnimation) {
                             val centerX = layout.boundsInParent().center.x - circleSizeVisible
@@ -214,7 +216,7 @@ fun CustomBottomNavigationBar(
 }
 
 @Composable
-private fun Button(
+fun ButtonTab(
     modifier: Modifier,
     index: Int,
     selectedIndex: Int,
@@ -252,7 +254,7 @@ private fun Button(
                         imageVector = icon,
                         contentDescription = "",
                         tint = if (selectedIndex == index) colors.selectedIconColor else colors.unSelectedIconColor,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(ICON_SIZE.dp)
                     )
                 }
             }
@@ -281,7 +283,7 @@ private fun Button(
 @Composable
 private fun CustomBottomNavigationBarPreview() {
     val map = MutableStateFlow(mapOf(1 to 11))
-    CustomBottomNavigationBar(
+    BottomNavigationBar(
         budgets = map.asStateFlow().collectAsState()
     )
 }
@@ -289,7 +291,7 @@ private fun CustomBottomNavigationBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun BottomBarViewThemeWithEmptyTextPreview() {
-    CustomBottomNavigationBar(
+    BottomNavigationBar(
         tabs = TabsModel.getBaseTabListWithOutText(),
     )
 }

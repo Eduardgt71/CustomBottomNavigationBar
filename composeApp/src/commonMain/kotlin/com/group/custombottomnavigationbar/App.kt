@@ -6,19 +6,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import com.group.bottomview.CustomBottomNavigationBar
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by rememberSaveable  { mutableIntStateOf(0) }
 
     MaterialTheme {
         Scaffold(
             bottomBar = {
-                CustomBottomNavigationBar(
+                MultiBottomNavigationBar(
                     selectedIndex = selectedIndex,
                     onItemSelected = {
                         selectedIndex = it

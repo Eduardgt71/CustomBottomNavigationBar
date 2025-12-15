@@ -63,8 +63,16 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+
+                implementation(compose.runtime)
+                implementation(compose.foundation)
                 implementation(compose.material3)
+                implementation(compose.ui)
                 implementation(compose.components.uiToolingPreview)
+
+                implementation(compose.components.resources)
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
             }
         }
 
@@ -76,9 +84,7 @@ kotlin {
 
         androidMain {
             dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
+                implementation(compose.preview)
             }
         }
 

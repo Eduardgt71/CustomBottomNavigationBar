@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-internal val Person: ImageVector
+val Person: ImageVector
     get() {
         if (_PersonSvgrepoCom != null) {
             return _PersonSvgrepoCom!!

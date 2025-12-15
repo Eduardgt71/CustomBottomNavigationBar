@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-internal val Search: ImageVector
+val Search: ImageVector
     get() {
         if (_SearchSvgrepoCom != null) {
             return _SearchSvgrepoCom!!

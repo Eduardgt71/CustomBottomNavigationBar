@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-internal val HomeIcon: ImageVector
+ val HomeIcon: ImageVector
     get() {
         if (_HomeIconSilhouetteSvgrepoCom != null) {
             return _HomeIconSilhouetteSvgrepoCom!!

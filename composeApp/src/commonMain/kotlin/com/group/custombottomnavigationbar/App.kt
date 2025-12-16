@@ -5,7 +5,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -18,8 +17,9 @@ fun App() {
     MaterialTheme {
         Scaffold(
             bottomBar = {
-                MultiBottomNavigationBar(
+                BottomNavigationBar(
                     selectedIndex = selectedIndex,
+                    tabs = MultiTabs.getMultiTabListWithText(),
                     onItemSelected = {
                         selectedIndex = it
                     }

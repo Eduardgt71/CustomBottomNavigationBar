@@ -1,6 +1,5 @@
 package com.group.custombottomnavigationbar
 
-import OutlineFile
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -34,45 +33,17 @@ import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.group.bottomview.ButtonTab
-import com.group.bottomview.Colors
 import com.group.bottomview.ConstantsUI.PARENT_CIRCLE_SIZE
-import com.group.bottomview.TabsModel
-import com.group.bottomview.drawable.HomeIcon
-import com.group.bottomview.drawable.OutlineChat
-import com.group.bottomview.drawable.OutlineZephyr
-import com.group.bottomview.drawable.Person
-import com.group.bottomview.drawable.Search
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-data class MultiTabs(
-    val tab: List<TabsModel>,
-    var selectedIndex: Int,
-) {
-    companion object {
-        fun getMultiTabListWithText(): List<MultiTabs> {
-            val tab1 = MultiTabs(listOf(TabsModel(HomeIcon, "Home")), 0)
-            val tab2 = MultiTabs(
-                listOf(
-                    TabsModel(OutlineChat, "Chat 1"),
-                    TabsModel(OutlineFile, "Chat 2"),
-                    TabsModel(OutlineZephyr, "Chat 3")
-                ), 0
-            )
-            val tab3 = MultiTabs(listOf(TabsModel(Search, "Search")), 0)
-            val tab4 = MultiTabs(listOf(TabsModel(Person, "Profile")), 0)
-            return listOf(tab1, tab2, tab3, tab4)
-        }
-    }
-}
 
 @Composable
-fun MultiBottomNavigationBar(
+fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     selectedIndex: Int = 0,
-    tabs: List<MultiTabs> = MultiTabs.getMultiTabListWithText(),
+    tabs: List<MultiTabs>,
     colors: Colors = Colors.getDefaultColors(),
     enableAnimation: Boolean = true,
     budgets: State<Map<Int, Int>>? = null,
@@ -159,7 +130,7 @@ fun MultiBottomNavigationBar(
                 )
                 .fillMaxWidth()
                 .background(colors.bacGroundColor)
-                .padding(3.dp),
+                .padding(top = 3.dp, bottom = 3.dp),
         ) {
 
             if (enableAnimation) {
@@ -247,7 +218,8 @@ fun MultiBottomNavigationBar(
 @Composable
 private fun Preview() {
     val map = MutableStateFlow(mapOf(1 to 11))
-    MultiBottomNavigationBar(
-        budgets = map.asStateFlow().collectAsState()
+    BottomNavigationBar(
+        budgets = map.asStateFlow().collectAsState(),
+        tabs = MultiTabs.getMultiTabListWithText()
     )
 }

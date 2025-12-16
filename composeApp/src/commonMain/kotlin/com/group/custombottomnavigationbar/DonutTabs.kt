@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.group.bottomview.ConstantsUI.ICON_SIZE
 import com.group.bottomview.ConstantsUI.PARENT_CIRCLE_SIZE
-import com.group.bottomview.TabsModel
 import com.group.bottomview.drawable.HomeIcon
 import com.group.bottomview.drawable.Person
 import com.group.bottomview.drawable.Search

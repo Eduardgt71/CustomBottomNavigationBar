@@ -1,4 +1,4 @@
-package com.group.custombottomnavigationbar
+package com.group.bottomview
 
 import OutlineFile
 import androidx.compose.runtime.Composable

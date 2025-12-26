@@ -1,4 +1,4 @@
-package com.group.custombottomnavigationbar
+package com.group.bottomview
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -38,7 +38,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun DonutTabs(
+fun DonutTabsView(
     modifier: Modifier = Modifier, // Модифікатор для зовнішнього компонування
     tabs: List<TabsModel>, // Список табів з іконками і назвами
     selectedTabIndex: Int = 0,
@@ -141,7 +141,7 @@ private fun DonutTabsPreview() {
         TabsModel(Person, "Profile"),
     )
 
-    DonutTabs(
+    DonutTabsView(
         tabs = tabs,
     )
 }

@@ -1,4 +1,4 @@
-package com.group.custombottomnavigationbar
+package com.group.bottomview
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
@@ -100,7 +100,7 @@ fun BottomNavigationBar(
                 val y = (moveToY?.toInt() ?: 0) - PARENT_CIRCLE_SIZE / 2
                 IntOffset(x, y)
             }) {
-                DonutTabs(
+                DonutTabsView(
                     tabs = selectedMultipleTabs?.tab ?: listOf(),
                     selectedTabIndex = selectedMultipleTabs?.selectedIndex ?: 0,
                     onTabSelected = { index ->
@@ -155,7 +155,7 @@ fun BottomNavigationBar(
                     val buttons = multiTabModel.tab
                     val button = buttons[multiTabModel.selectedIndex]
 
-                    ButtonTab(
+                    ButtonTabView(
                         Modifier.onGloballyPositioned { layout ->
                             if (enableAnimation) {
                                 val centerX = layout.boundsInParent().center.x - circleSizeVisible

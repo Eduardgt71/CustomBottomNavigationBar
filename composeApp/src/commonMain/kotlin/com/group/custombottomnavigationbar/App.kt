@@ -7,6 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.group.bottomview.BottomNavigationBar
+import com.group.bottomview.MultiTabs
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

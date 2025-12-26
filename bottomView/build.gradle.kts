@@ -73,6 +73,7 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
+                //implementation ("io.github.ehsannarmani:compose-charts:0.2.0")
             }
         }
 
